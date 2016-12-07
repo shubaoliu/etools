@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# stext: substitute (replace) text in side a directory inside a file using "find".
+#
+# usage: stext path text1 text2
+# example: stext ~/workspace/base Image CImage
+#
+# Copyright (c) 2008 Shubao Liu (shubao.liu@gmail.com)
+# All rights reserved.
+
+if [ $# -ne 3 ]
+then
+  echo "Error: incorrect number of arguments"
+  echo "usage: replacetext path text1 text2"
+  exit $E_BADARGS
+fi
+
+if [ -z "$1" ]
+then
+  echo "Error: empty path"
+  echo "usage: replacetext path pattern"
+  exit $E_BADARGS
+fi
+
+if [ -z "$2" ]
+then
+  echo "Error: empty pattern"
+  echo "usage: replacetext path pattern"
+  exit $E_BADARGS
+fi
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  SED_CMD=gsed
+else
+  SED_CMD=sed
+fi
+
+find "$1" -path '*/.svn' -prune -o -path './third_party/*' -prune -o -type f -exec ${SED_CMD} -i 's/'"$2"'/'"$3"'/g' {} \;
