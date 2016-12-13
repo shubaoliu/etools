@@ -1,0 +1,54 @@
+#!/bin/bash
+#
+# Copyright (c) 2008 Shubao Liu (shubao.liu@gmail.com)
+# All rights reserved.
+#
+# fftext: find specific text inside certain files using "find".
+# 
+# usage: fftext where what_file what_text
+# example: fftext ~/workspace/codebase/ "*.tpp" Callback
+# example: fftext ~/workspace/codebase/ "*.tpp" "class Square"
+#
+# It also supports regular expression (the format is the same as in grep):
+# example: fftext ~/workspace/codebase/ "*.h" "class .*Square"
+# example: fftext ~/workspace/codebase/ "*.h" "Square|Rectangle"
+
+if [ $# -ne 3 ]
+then
+  echo "Error: incorrect number of arguments"
+  echo "usage: fftext path file_pattern text_pattern"
+  exit $E_BADARGS
+fi
+
+if [ -z "$1" ]
+then
+  echo "Error: empty path"
+  echo "usage: fftext path file_pattern text_pattern"
+  exit $E_BADARGS
+fi
+
+if [ -z "$2" ]
+then
+  echo "Error: empty file pattern"
+  echo "usage: fftext path file_pattern text_pattern"
+  exit $E_BADARGS
+fi
+
+if [ -z "$3" ]
+then
+  echo "Error: empty text pattern"
+  echo "usage: fftext path file_pattern text_pattern"
+  exit $E_BADARGS
+fi
+
+
+find "$1" -path '*/.svn' -prune \
+    -o -path './third_party/*' -prune \
+    -o -path './3rdparty/*' -prune \
+    -o -path '*/build/*' -prune \
+    -o -type f \
+    -name "$2" \
+    -exec grep -n --color=auto --binary-files=without-match -E "$3" {} /dev/null \;
+    #-exec grep -i -n --color=auto --binary-files=without-match "$3" {} /dev/null \;
+
+# comment: grep is case-sensitive by default; use -i to ignore case.
